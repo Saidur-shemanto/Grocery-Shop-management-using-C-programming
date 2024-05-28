@@ -1,3 +1,4 @@
-Butter 75
+Butter 80
 Detergents 14
 Rice 45
+Flour 50

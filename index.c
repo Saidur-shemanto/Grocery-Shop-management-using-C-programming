@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 const int sz = 255;
-char userName[20], userPassword[20], str[100];
+char userName[20], userPassword[20], strid[100], strpass[100];
 int count = 1, flag = 0, logFlag = 0;
+void addUserItems()
+{
+}
+void printSlip()
+{
+}
 void showItems()
 {
     FILE *fptr;
@@ -10,15 +16,9 @@ void showItems()
     fptr = fopen("items.txt", "r");
     while (fgets(buffer, sizeof(buffer), fptr) != NULL)
     {
-        // Remove the newline character at the end (optional)
         buffer[strcspn(buffer, "\n")] = '\0';
         printf("%s\n", buffer);
     }
-
-    // while (fscanf(fptr, "%s", str) != EOF)
-    // {
-    //     printf("%s", str);
-    // }
 }
 void addItems()
 {
@@ -33,28 +33,13 @@ void addItems()
     printf("%s %d", item, n);
     fprintf(fptr, "%s %d\n", item, n);
     fclose(fptr);
-
-    // while (fscanf(fptr, "%s %d", item, &quantity) != EOF)
-    // {
-    //     if (strcmp(item, "RICE") == 0)
-    //     {
-    //         found = 1;
-    //         fseek(fptr, -strlen(buffer), SEEK_CUR);
-    //         fprintf(fptr, "%s %d\n", item, quantity + 10);
-    //         break;
-    //     }
-    //     else
-    //     {
-
-    //         fgets(buffer, sizeof(buffer), fptr);
-    //     }
-    // }
 }
 void editItems()
 {
     char item[50], buffer[100], itemName[50];
     int quantity, found = 0, n;
     FILE *fptr, *fptrWrite;
+    showItems();
     fptrWrite = fopen("tempItems.txt", "w");
     fptr = fopen("items.txt", "r");
     printf("Enter the Item you want to edit: ");
@@ -91,6 +76,7 @@ void editItems()
 void show()
 {
     int n;
+    printf("\e[1;1H\e[2J");
     printf("Choose an Option\n");
 
     printf("1. Show Items\n");
@@ -103,16 +89,17 @@ void show()
     }
     else if (n == 2)
     {
-        addItems();
+        addUserItems();
     }
     else if (n == 3)
     {
-        editItems();
+        printSlip();
     }
 }
 void adminPanel()
 {
     int n;
+    printf("\e[1;1H\e[2J");
     printf("Choose an Option\n");
 
     printf("1. Show Items\n");
@@ -136,59 +123,33 @@ void userLogin()
 {
 
     FILE *fptr;
-here:
+here1:
 
     printf("Enter Username\n");
     scanf("%s", &userName);
-    // if (userName[strlen(userName) - 1] == '\n')
-    // {
-    //     userName[strlen(userName) - 1] = '\0';
-    // }
+
     printf("Enter Password\n");
     scanf("%s", &userPassword);
-    // if (userPassword[strlen(userPassword) - 1] == '\n')
-    // {
-    //     userPassword[strlen(userPassword) - 1] = '\0';
-    // }
-    fptr = fopen("filename.txt", "r");
-    while (fscanf(fptr, "%s", str) != EOF)
-    {
-        if (count % 2 != 0)
-        {
-            // printf("%s", str);
-            if (strcmp(str, userName) == 0)
-            {
-                count++;
-                flag = 1;
-            }
-            else
-            {
-                count++;
-            }
-        }
-        else if (count % 2 == 0 && flag == 1)
-        {
-            if (strcmp(str, userPassword) == 0)
-            {
 
+    fptr = fopen("filename.txt", "r");
+    while (fscanf(fptr, "%s %s", strid, strpass) != EOF)
+    {
+        if (strcmp(strid, userName) == 0)
+        {
+            flag = 1;
+            if (strcmp(strpass, userPassword) == 0)
+            {
                 logFlag = 1;
                 break;
             }
             else
             {
-                printf("Incorrect Password\n");
-                count = 1;
-                fclose(fptr);
-                goto here;
+                printf("Wrong password, try again\n");
+
+                goto here1;
             }
         }
-        else
-        {
-            count++;
-            continue;
-        }
     }
-
     fclose(fptr);
 
     if (logFlag == 1)
@@ -204,33 +165,28 @@ void userSignup()
 {
     char str[100];
 
-    FILE *fptr;
+    FILE *fptr, *fptr1;
 here2:
     fptr = fopen("filename.txt", "a");
+    fptr1 = fopen("filename.txt", "r");
     printf("Enter Username\n");
     scanf("%s", &userName);
-    if (userName[strlen(userName) - 1] == '\n')
+
+    while (fscanf(fptr1, "%s %s", strid, strpass) != EOF)
     {
-        userName[strlen(userName) - 1] = '\0';
-    }
-    while (fscanf(fptr, "%s", str) != EOF)
-    {
-        printf("%s", str);
-        if (strcmp(str, userName) == 0)
+
+        if (strcmp(strid, userName) == 0)
         {
-            printf("already exists, choose another name");
+            printf("already exists, choose another name\n");
             goto here2;
         }
     }
     printf("Enter Password\n");
     scanf("%s", &userPassword);
-    if (userPassword[strlen(userPassword) - 1] == '\n')
-    {
-        userPassword[strlen(userPassword) - 1] = '\0';
-    }
 
-    fprintf(fptr, "%s\n%s\n", userName, userPassword);
+    fprintf(fptr, "%s %s\n", userName, userPassword);
     fclose(fptr);
+    fclose(fptr1);
 }
 int main()
 {
@@ -239,6 +195,7 @@ int main()
     FILE *fptr;
     char ch;
 here:
+    printf("\e[1;1H\e[2J");
     printf("Press 1 to Login\n");
     printf("Press 2 to Signup\n");
     printf("Press 3 for Owner Login\n");
