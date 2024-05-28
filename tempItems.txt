@@ -1,4 +1,5 @@
-Butter 80
-Detergents 14
-Rice 45
-Flour 50
+Butter 90 60
+Detergents 14 55
+Rice 95 100
+Flour 50 55
+Chips 10 10

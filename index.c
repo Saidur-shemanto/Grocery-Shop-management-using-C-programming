@@ -1,43 +1,56 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 const int sz = 255;
-char userName[20], userPassword[20], strid[100], strpass[100];
+char userName[20], userPassword[20], strid[100], strpass[100], userItemPrice[200];
+char userItems[100][20];
 int count = 1, flag = 0, logFlag = 0;
 void addUserItems()
 {
+    FILE *fptr;
+    char item[50];
+    int quantity;
+    fptr = fopen("items.txt", "r");
+    while (fscanf(fptr, "%s %d", item, &quantity) != EOF)
+    {
+    }
 }
 void printSlip()
 {
 }
 void showItems()
 {
+    char item[50];
+    int quantity, price;
     FILE *fptr;
     char buffer[100];
     fptr = fopen("items.txt", "r");
-    while (fgets(buffer, sizeof(buffer), fptr) != NULL)
+    while (fscanf(fptr, "%s %d %d", item, &quantity, &price) != EOF)
     {
-        buffer[strcspn(buffer, "\n")] = '\0';
-        printf("%s\n", buffer);
+
+        printf("%s amount:%d price:%dtk\n", item, quantity, price);
     }
 }
 void addItems()
 {
     char item[50];
-    int n;
+    int m, n;
     FILE *fptr;
     fptr = fopen("items.txt", "a");
     printf("Enter the Item Name\n");
     scanf("%s", &item);
     printf("Enter the amount\n");
+    scanf("%d", &m);
+    printf("Enter the Price\n");
     scanf("%d", &n);
     printf("%s %d", item, n);
-    fprintf(fptr, "%s %d\n", item, n);
+    fprintf(fptr, "%s %d %d\n", item, m, n);
     fclose(fptr);
 }
 void editItems()
 {
     char item[50], buffer[100], itemName[50];
-    int quantity, found = 0, n;
+    int quantity, found = 0, n, price;
     FILE *fptr, *fptrWrite;
     showItems();
     fptrWrite = fopen("tempItems.txt", "w");
@@ -46,7 +59,7 @@ void editItems()
     scanf("%s", &itemName);
     printf("Enter the amount: ");
     scanf("%d", &n);
-    while (fscanf(fptr, "%s %d", item, &quantity) != EOF)
+    while (fscanf(fptr, "%s %d %d", item, &quantity, &price) != EOF)
     {
 
         if (strcmp(item, itemName) == 0)
@@ -55,7 +68,7 @@ void editItems()
             found = 1;
         }
 
-        fprintf(fptrWrite, "%s %d\n", item, quantity);
+        fprintf(fptrWrite, "%s %d %d\n", item, quantity, price);
     }
     if (found == 0)
     {
@@ -65,10 +78,49 @@ void editItems()
     fclose(fptrWrite);
     fptrWrite = fopen("tempItems.txt", "r");
     fptr = fopen("items.txt", "w");
-    while (fscanf(fptrWrite, "%s %d", item, &quantity) != EOF)
+    while (fscanf(fptrWrite, "%s %d %d", item, &quantity, &price) != EOF)
     {
 
-        fprintf(fptr, "%s %d\n", item, quantity);
+        fprintf(fptr, "%s %d %d\n", item, quantity, price);
+    }
+    fclose(fptr);
+    fclose(fptrWrite);
+}
+void editItemsPrice()
+{
+    char item[50], buffer[100], itemName[50];
+    int quantity, found = 0, n, price;
+    FILE *fptr, *fptrWrite;
+    showItems();
+    fptrWrite = fopen("tempItems.txt", "w");
+    fptr = fopen("items.txt", "r");
+    printf("Enter the Item you want to edit: ");
+    scanf("%s", &itemName);
+    printf("Enter the new: ");
+    scanf("%d", &n);
+    while (fscanf(fptr, "%s %d %d", item, &quantity, &price) != EOF)
+    {
+
+        if (strcmp(item, itemName) == 0)
+        {
+            price = n;
+            found = 1;
+        }
+
+        fprintf(fptrWrite, "%s %d %d\n", item, quantity, price);
+    }
+    if (found == 0)
+    {
+        printf("No items have been found");
+    }
+    fclose(fptr);
+    fclose(fptrWrite);
+    fptrWrite = fopen("tempItems.txt", "r");
+    fptr = fopen("items.txt", "w");
+    while (fscanf(fptrWrite, "%s %d %d", item, &quantity, &price) != EOF)
+    {
+
+        fprintf(fptr, "%s %d %d\n", item, quantity, price);
     }
     fclose(fptr);
     fclose(fptrWrite);
@@ -76,6 +128,7 @@ void editItems()
 void show()
 {
     int n;
+here:
     printf("\e[1;1H\e[2J");
     printf("Choose an Option\n");
 
@@ -86,6 +139,7 @@ void show()
     if (n == 1)
     {
         showItems();
+        goto here;
     }
     else if (n == 2)
     {
@@ -99,24 +153,55 @@ void show()
 void adminPanel()
 {
     int n;
-    printf("\e[1;1H\e[2J");
+    char adminName[10];
+    char adminPassWord[10];
+    printf("Enter the name\n");
+
+    scanf("%s", &adminName);
+    printf("Enter the password\n");
+    scanf("%s", &adminPassWord);
+    while ((strcmp(adminName, "admin") != 0) && (strcmp(adminPassWord, "admin") != 0))
+    {
+        printf("Incorrect Information, Try again\n");
+        printf("Enter the name\n");
+        scanf("%s", &adminName);
+        printf("Enter the password\n");
+        scanf("%s", &adminPassWord);
+    }
+    printf("Signed in as an Admin!\n");
+here:
+
     printf("Choose an Option\n");
 
     printf("1. Show Items\n");
     printf("2. Add Items\n");
-    printf("3. Edit Items\n");
+    printf("3. Edit Items Amount\n");
+    printf("4. Edit Items price\n");
+    printf("5. Sign Out\n");
     scanf("%d", &n);
     if (n == 1)
     {
         showItems();
+        goto here;
     }
     else if (n == 2)
     {
         addItems();
+        goto here;
     }
     else if (n == 3)
     {
         editItems();
+        goto here;
+    }
+    else if (n == 4)
+    {
+        editItemsPrice();
+        goto here;
+    }
+    else if (n == 5)
+    {
+        exit(1);
     }
 }
 void userLogin()
