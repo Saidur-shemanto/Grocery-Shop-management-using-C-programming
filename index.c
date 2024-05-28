@@ -2,18 +2,42 @@
 #include <string.h>
 #include <stdlib.h>
 const int sz = 255;
-char userName[20], userPassword[20], strid[100], strpass[100], userItemPrice[200];
+char userName[20], userPassword[20], strid[100], strpass[100];
 char userItems[100][20];
+int userItemAmount[200], userItemPrice[200];
 int count = 1, flag = 0, logFlag = 0;
 void addUserItems()
 {
     FILE *fptr;
     char item[50];
-    int quantity;
-    fptr = fopen("items.txt", "r");
-    while (fscanf(fptr, "%s %d", item, &quantity) != EOF)
+    int quantity, price, count = 0, n, flag1 = 0;
+    while (flag1 != 1)
     {
+        printf("Enter the Item name you want to buy: ");
+        scanf("%s", &userItems[count]);
+        printf("Enter the Amount");
+        scanf("%d", &userItemAmount[count]);
+        count++;
+        printf("If you want to Buy more, press 1, else press 2\n");
+        scanf("%d", &n);
+        if (n == 1)
+        {
+            continue;
+        }
+        else
+        {
+            for (int i = 0; i <= count; i++)
+            {
+                printf("Item Name: %s Item Amount: %d \n", userItems[i], userItemAmount[i]);
+            }
+            flag1 = 1;
+        }
     }
+
+    // fptr = fopen("items.txt", "r");
+    // while (fscanf(fptr, "%s %d %d", item, &quantity, &price) != EOF)
+    // {
+    // }
 }
 void printSlip()
 {
